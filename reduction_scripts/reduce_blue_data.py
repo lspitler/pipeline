@@ -48,25 +48,25 @@ proc_steps = [
     {'step':'bpm_repair'     , 'run':True, 'suffix':'01', 'args':{}},
     #------------------
     {'step':'superbias'      , 'run':True, 'suffix':None,
-     'args':{'method':'row_med', 
-             'plot':False, 
+     'args':{'method':'row_med',
+             'plot':False,
              'verbose':False}},
     {'step':'bias_sub'       , 'run':True, 'suffix':'02',
-     'args':{'method':'subtract', 
-             'plot':False, 
+     'args':{'method':'subtract',
+             'plot':False,
              'verbose':False}},
     #------------------
     {'step':'superflat'      , 'run':True, 'suffix':None,
      'args':{'source':'dome'}},
     {'step':'superflat'      , 'run':True, 'suffix':None,
-     'args':{'source':'twi', 
+     'args':{'source':'twi',
              'scale':'median_nonzero'}},
     {'step':'slitlet_profile', 'run':True, 'suffix':None, 'args':{}},
     #------------------
     {'step':'flat_cleanup'   , 'run':True, 'suffix':None,
 #     'args':{'type':['dome','twi'],  # ADD TWI for twilight flats
-     'args':{'type':['dome'], 
-             'verbose':True, 
+     'args':{'type':['dome'],
+             'verbose':True,
              'plot':False,
              #'buffer':4,
              'offsets':[0.4,0.4],
@@ -112,11 +112,11 @@ proc_steps = [
      'args':{'multithread':multithread,
              'adr':True,
              #'dw_set':0.77,
-             'wmin_set':3500.0, 
+             'wmin_set':3500.0,
              'wmax_set':5700.0}},
     #------------------
     {'step':'extract_stars'  , 'run':True, 'suffix':None,
-     'args':{'ytrim':4, 
+     'args':{'ytrim':4,
              'type':'flux'}},
     {'step':'derive_calib'   , 'run':True, 'suffix':None,
      'args':{'plot_stars':True,
@@ -151,7 +151,7 @@ def get_full_obs_list(metadata):
                 metadata['std']):
         for key in obs.keys():
             # Fred's update 2 (another consequence of it ...)
-            if (key != 'type') and (key != 'name'): 
+            if (key != 'type') and (key != 'name'):
                 for fn in obs[key]:
                     if fn not in full_obs_list:
                         full_obs_list.append(fn)
@@ -200,7 +200,7 @@ def get_associated_calib(metadata, this_fn, type):
                     if obs[type] != '' :
                         return obs[type]
     return False
-        
+
 #------------------
 # primary ones!
 def get_primary_sci_obs_list(metadata):
@@ -226,10 +226,10 @@ def get_primary_std_obs_list(metadata, type='all'):
 # NAMES FOR MASTER CALIBRATION FILES!!!
 superbias_fn     = '%s_superbias.fits' % calib_prefix
 superbias_fit_fn = '%s_superbias_fit.fits' % calib_prefix
-super_dflat_raw  = '%s_super_domeflat_raw.fits' % calib_prefix 
+super_dflat_raw  = '%s_super_domeflat_raw.fits' % calib_prefix
 super_dflat_fn   = '%s_super_domeflat.fits' % calib_prefix
 super_dflat_mef  = '%s_super_domeflat_mef.fits' % calib_prefix
-super_tflat_raw  = '%s_super_twiflat_raw.fits' % calib_prefix 
+super_tflat_raw  = '%s_super_twiflat_raw.fits' % calib_prefix
 super_tflat_fn   = '%s_super_twiflat.fits' % calib_prefix
 super_tflat_mef  = '%s_super_twiflat_mef.fits' % calib_prefix
 slitlet_def_fn   = '%s_slitlet_defs.pkl' % calib_prefix
@@ -284,7 +284,7 @@ def run_superbias(metadata, prev_suffix, curr_suffix,
         # Fit a smart surface to the bias or take the median
         # A bit experimental so far ... but you know what you are doing, right ?
         pywifes.generate_wifes_bias_fit(
-            superbias_fn, superbias_fit_fn, 
+            superbias_fn, superbias_fit_fn,
             data_hdu=my_data_hdu, method=method, **args)
     else:
         pywifes.imcopy(superbias_fn, superbias_fit_fn)
@@ -308,7 +308,7 @@ def run_superbias(metadata, prev_suffix, curr_suffix,
             pywifes.imcombine(local_biases_filename,local_superbias, data_hdu=my_data_hdu)
             # step 2 - generate fit!
             if method == 'fit' or method == 'row_med':
-                pywifes.generate_wifes_bias_fit(local_superbias, 
+                pywifes.generate_wifes_bias_fit(local_superbias,
                                                 local_superbias_fit,
                                                 data_hdu=my_data_hdu,
                                                 method=method, **args)
@@ -344,7 +344,7 @@ def run_bias_sub(metadata, prev_suffix, curr_suffix,
         if method == 'copy':
             pywifes.imcopy(in_fn, out_fn)
         else:
-            pywifes.imarith(in_fn, '-', bias_fit_fn, out_fn, 
+            pywifes.imarith(in_fn, '-', bias_fit_fn, out_fn,
                             data_hdu=my_data_hdu)
     return
 
@@ -485,7 +485,7 @@ def run_wave_soln(metadata, prev_suffix, curr_suffix, **args):
         # for both to later interpolate between them.
         # Restrict it to the first two arcs in the list (in case the feature is
         # being unknowingly used, avoid too much lost time).
-        local_arcs = get_associated_calib(metadata,fn, 'arc')            
+        local_arcs = get_associated_calib(metadata,fn, 'arc')
         if local_arcs :
             for i in range(np.min([2,np.size(local_arcs)])):
                 local_arc_fn = os.path.join(out_dir, '%s.p%s.fits' % (local_arcs[i], prev_suffix))
@@ -513,7 +513,7 @@ def run_wire_soln(metadata, prev_suffix, curr_suffix):
         # Check if the file has a dedicated wire associated with it ...
         # Only for Science and Std stars for now (sky not required at this stage)
         # (less critical for the rest anyway ...)
-        local_wires = get_associated_calib(metadata,fn, 'wire')            
+        local_wires = get_associated_calib(metadata,fn, 'wire')
         if local_wires :
             local_wire_fn = os.path.join(out_dir, '%s.p%s.fits' % (local_wires[0], prev_suffix))
             local_wire_out_fn = os.path.join(out_dir, '%s.wire.fits' % (out_dir, local_wires[0]))
@@ -637,7 +637,7 @@ def run_obs_coadd(metadata, prev_suffix, curr_suffix,
             if skip_done and os.path.isfile(out_fn):
                 continue
             print('Copying image %s' % in_fn.split('/')[-1])
-            pywifes.imcopy(in_fn, out_fn)            
+            pywifes.imcopy(in_fn, out_fn)
         # coadd sci frames!
         else:
             in_fn_list = [os.path.join(out_dir, '%s.p%s.fits' % (fn, prev_suffix))
@@ -706,7 +706,7 @@ def run_cube_gen(metadata, prev_suffix, curr_suffix, **args):
         local_arcs = get_associated_calib(metadata,fn, 'arc')
         if local_arcs :
             # Do I have two arcs ? Do they surround the Science file ?
-            # Implement linear interpolation as suggested by Mike I. 
+            # Implement linear interpolation as suggested by Mike I.
             if len(local_arcs) ==2:
                 # First, get the Science time
                 f = pyfits.open(in_fn)
@@ -717,14 +717,14 @@ def run_cube_gen(metadata, prev_suffix, curr_suffix, **args):
                 for i in range(2):
                     # Fetch the arc time from the "extra" pkl file
                     local_wsol_out_fn_extra = os.path.join(out_dir, '%s.wsol.fits_extra.pkl' % (local_arcs[i]))
-                    f = open(local_wsol_out_fn_extra, 'rb') 
+                    f = open(local_wsol_out_fn_extra, 'rb')
                     try:
                         f_pickled = pickle.load(f, protocol=2) # TODO: see if this works
                     except:
                         f_pickled = pickle.load(f) # Python 3
                     f.close()
                     arc_times[i] = f_pickled[-1][0]
-                 
+
                 # Now, make sure the Science is between the arcs:
                 t0 = datetime.datetime( np.int(arc_times[0].split('-')[0]),
                                         np.int(arc_times[0].split('-')[1]),
@@ -753,8 +753,8 @@ def run_cube_gen(metadata, prev_suffix, curr_suffix, **args):
                     # Alright, I need to interpolate betweent the two arcs
                     w1 = ds1/(ds1+ds2)
                     w2 = ds2/(ds1+ds2)
-                     
-                    # Open the arc solution files 
+
+                    # Open the arc solution files
                     fn0 = os.path.join(out_dir, '%s.wsol.fits' % (local_arcs[0]))
                     fn1 = os.path.join(out_dir, '%s.wsol.fits' % (local_arcs[1]))
                     fits0 = pyfits.open(fn0)
@@ -769,14 +769,14 @@ def run_cube_gen(metadata, prev_suffix, curr_suffix, **args):
 
                     print('(2 arcs found)')
                     print('(Note: using %sx%s.wsol.fits + %sx%s.wsol.fits as wsol file)' % (np.round(w1,2),local_arcs[0],np.round(w2,2),local_arcs[1]))
-                           
+
                 else:
                     # Arcs do not surround the Science frame
                     # Revert to using the first one instead
                     wsol_fn = os.path.join(out_dir, '%s.wsol.fits' % (local_arcs[0]))
                     print('(2 arcs found, but they do not bracket the Science frame!)')
                     print('(Note: using %s as wsol file)' % wsol_fn.split('/')[-1])
-                    
+
             else:
                 # Either 1 or more than two arcs present ... only use the first one !
                 wsol_fn = os.path.join(out_dir, '%s.wsol.fits' % (local_arcs[0]))
